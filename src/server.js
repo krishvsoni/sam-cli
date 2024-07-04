@@ -12,6 +12,7 @@ const port = 3000;
 
 app.use(bodyParser.json());
 
+
 const upload = multer({ dest: 'uploads/' });
 
 const arweave = new Arweave({
