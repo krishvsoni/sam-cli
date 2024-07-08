@@ -37,14 +37,15 @@ def analyze_return(code):
                     "low",
                     get_line_number(node)
                 )
-
 def is_potential_overflow(number):
     return number >= INT_MAX or number <= INT_MIN
+
 def get_line_number(node):
     if hasattr(node, 'line') and node.line is not None:
         return node.line
+    if hasattr(node, '_parent'):
+        return get_line_number(node._parent)
     return None  
-
 
 def analyze_overflow_in_node(node):
     if isinstance(node, (astnodes.AddOp, astnodes.SubOp, astnodes.MultOp)):
@@ -57,7 +58,7 @@ def analyze_overflow_in_node(node):
                 "Potential integer overflow/underflow detected with left operand.",
                 "overflow_underflow",
                 "high",
-                get_line_number(node)
+                get_line_number(left_operand)
             )
 
         if isinstance(right_operand, astnodes.Number) and is_potential_overflow(right_operand.n):    
@@ -66,7 +67,7 @@ def analyze_overflow_in_node(node):
                 "Potential integer overflow/underflow detected with right operand.",
                 "overflow_underflow",
                 "high",
-                get_line_number(node)
+                get_line_number(right_operand)
             )
     
     if isinstance(node, astnodes.LocalAssign):
@@ -77,7 +78,7 @@ def analyze_overflow_in_node(node):
                     "Potential integer overflow/underflow detected with local variable assignment.",
                     "overflow_underflow",
                     "high",
-                    get_line_number(node)
+                    get_line_number(value)
                 )
     
     if isinstance(node, astnodes.Function):
@@ -88,7 +89,7 @@ def analyze_overflow_in_node(node):
                     "Potential integer overflow/underflow detected with function argument.",
                     "overflow_underflow",
                     "high",
-                    get_line_number(node)
+                    get_line_number(arg)
                 )
 
 def analyze_overflow_and_return(code):
@@ -111,7 +112,7 @@ def analyze_overflow_and_return(code):
                                 f"Potential integer overflow/underflow detected in return statement of function '{node.name.id}'.",
                                 "overflow_underflow",
                                 "high",
-                                get_line_number(n)
+                                get_line_number(ret_val)
                             )
 
 def check_private_key_exposure(code):
