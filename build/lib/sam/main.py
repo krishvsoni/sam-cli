@@ -1,6 +1,10 @@
+# main.py
+
 from luaparser import ast, astnodes
 import os
 import json
+from pathlib import Path
+from jinja2 import Environment, FileSystemLoader
 
 INT_MAX = 2147483647
 INT_MIN = -2147483648
@@ -281,74 +285,82 @@ def analyze_greedy_suicidal_functions(code):
     def is_fund_transfer(node):
         return isinstance(node, astnodes.Call) and isinstance(node.func, astnodes.Name) and node.func.id.lower() in transfer_functions
 
-    def has_conditional(node):
-        return isinstance(node, (astnodes.If, astnodes.ElseIf))
-
     for node in ast.walk(tree):
         if isinstance(node, astnodes.Function):
-            has_transfer = False
-            has_condition = False
-
             for n in node.body.body:
                 if is_fund_transfer(n):
-                    has_transfer = True
-                if has_conditional(n):
-                    has_condition = True
-
-            if has_transfer and not has_condition:
-                add_vulnerability(
-                    "Greedy/Suicidal Functions",
-                    f"Potential greedy/suicidal contract detected in function '{node.name.id}'.",
-                    "greedy_suicidal_function",
-                    "high",
-                    get_line_number(node)
-                )
+                    add_vulnerability(
+                        "Greedy Suicidal Functions",
+                        f"Potential issue with fund transfer function '{n.func.id}'.",
+                        "greedy_suicidal_function",
+                        "high",
+                        get_line_number(n)
+                    )
 
 def print_vulnerabilities():
-    for vuln in vulnerabilities:
-        color = COLORS["reset"]
-        if vuln["severity"] == "high":
-            color = COLORS["red"]
-        elif vuln["severity"] == "medium":
-            color = COLORS["yellow"]
-        elif vuln["severity"] == "low":
-            color = COLORS["cyan"]
-
-        print(f"{color}Name: {vuln['name']}\nDescription: {vuln['description']}\nPattern: {vuln['pattern']}\nSeverity: {vuln['severity']}\nLine: {vuln['line']}{COLORS['reset']}\n")
+    for vulnerability in vulnerabilities:
+        severity_color = COLORS["red"] if vulnerability["severity"] == "high" else COLORS["yellow"]
+        print(f"{severity_color}Vulnerability: {vulnerability['name']} ({vulnerability['severity']}){COLORS['reset']}")
+        print(f"Description: {vulnerability['description']}")
+        print(f"Pattern: {vulnerability['pattern']}")
+        print(f"Line: {vulnerability['line']}\n")
 
 def save_report(file_path):
-    with open(file_path, 'w') as report_file:
-        json.dump(vulnerabilities, report_file, indent=4)
+    with open(file_path, 'w') as file:
+        json.dump(vulnerabilities, file, indent=4)
+
+def run_analysis(file_path):
+    with open(file_path, 'r') as file:
+        code = file.read()
+
+    analyze_return(code)
+    analyze_overflow_and_return(code)
+    analyze_underflow_and_return(code)
+    analyze_reentrancy(code)
+    check_private_key_exposure(code)
+    analyze_floating_pragma(code)
+    analyze_denial_of_service(code)
+    analyze_unchecked_external_calls(code)
+    analyze_greedy_suicidal_functions(code)
+
+    print_vulnerabilities()
+
+    report_json_path = "report.json"
+    report_html_path = "report.html"
+
+    save_report(report_json_path)
+    generate_html_report(report_json_path, report_html_path)
+    print(f"\nVulnerability report saved to {report_json_path} and {report_html_path}\n")
 
 def main():
-    while True:
-        file_path = input("Enter the path to the Lua code file (or 'exit' to quit): ").strip()
-        if file_path.lower() == 'exit':
-            break
+    import argparse
 
-        if not os.path.isfile(file_path):
-            print("File not found. Please enter a valid file path.")
-            continue
+    parser = argparse.ArgumentParser(description="Vulnerability Analyzer")
+    parser.add_argument("file", help="Path to code file")
+    parser.add_argument("--function", help="Specify a function to run (e.g., --function analyze_return)")
 
-        with open(file_path, 'r') as file:
-            code = file.read()
+    args = parser.parse_args()
 
-        print("Analyzing the provided Lua code for vulnerabilities:")
-        analyze_return(code)
-        analyze_overflow_and_return(code)
-        analyze_underflow_and_return(code)
-        analyze_reentrancy(code)
-        check_private_key_exposure(code)
-        analyze_floating_pragma(code)
-        analyze_denial_of_service(code)
-        analyze_unchecked_external_calls(code)
-        analyze_greedy_suicidal_functions(code)
+    if os.path.isfile(args.file):
+        print(f"Analyzing file: {args.file}")
+        run_analysis(args.file)
+    else:
+        print("File not found. Please enter a valid file path.")
 
-        print_vulnerabilities()
+def generate_html_report(json_file, html_file):
+    with open(json_file, 'r') as f:
+        vulnerabilities = json.load(f)
 
-        report_file_path = "report.json"
-        save_report(report_file_path)
-        print(f"\nVulnerability report saved to {report_file_path}\n")
+    template_loader = FileSystemLoader(searchpath="./")
+    template_env = Environment(loader=template_loader)
+    template = template_env.get_template("report_template.html")
+
+    output_text = template.render(vulnerabilities=vulnerabilities)
+
+    with open(html_file, 'w') as f:
+        f.write(output_text)
+
+    print(f"Report generated: {html_file}")
 
 if __name__ == "__main__":
     main()

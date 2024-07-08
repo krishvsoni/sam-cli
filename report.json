@@ -53,28 +53,21 @@
         "description": "A function is missing a return statement.",
         "pattern": "missing_return",
         "severity": "low",
-        "line": 57
+        "line": 59
     },
     {
         "name": "Missing Return Statement",
         "description": "A function is missing a return statement.",
         "pattern": "missing_return",
         "severity": "low",
-        "line": 63
+        "line": 64
     },
     {
         "name": "Missing Return Statement",
         "description": "A function is missing a return statement.",
         "pattern": "missing_return",
         "severity": "low",
-        "line": 68
-    },
-    {
-        "name": "Missing Return Statement",
-        "description": "A function is missing a return statement.",
-        "pattern": "missing_return",
-        "severity": "low",
-        "line": 74
+        "line": 70
     },
     {
         "name": "Integer Overflow",
@@ -151,41 +144,34 @@
         "description": "Floating pragma issue detected with function 'setfenv'.",
         "pattern": "floating_pragma",
         "severity": "low",
-        "line": 69
+        "line": 65
     },
     {
         "name": "Floating Pragma",
         "description": "Floating pragma issue detected with function 'getfenv'.",
         "pattern": "floating_pragma",
         "severity": "low",
-        "line": 70
+        "line": 66
     },
     {
         "name": "Denial of Service",
         "description": "Potential Denial of Service vulnerability detected with function 'perform_expensive_operation'.",
         "pattern": "denial_of_service",
         "severity": "medium",
-        "line": 75
+        "line": 71
     },
     {
-        "name": "Unchecked External Calls",
-        "description": "Unchecked external call detected in function 'call_external'.",
-        "pattern": "unchecked_external_call",
-        "severity": "medium",
-        "line": 58
-    },
-    {
-        "name": "Greedy/Suicidal Functions",
-        "description": "Potential greedy/suicidal contract detected in function 'greedy_function'.",
+        "name": "Greedy Suicidal Functions",
+        "description": "Potential issue with fund transfer function 'transfer'.",
         "pattern": "greedy_suicidal_function",
         "severity": "high",
-        "line": 39
+        "line": 40
     },
     {
-        "name": "Greedy/Suicidal Functions",
-        "description": "Potential greedy/suicidal contract detected in function 'unsafe_transfer'.",
+        "name": "Greedy Suicidal Functions",
+        "description": "Potential issue with fund transfer function 'transfer'.",
         "pattern": "greedy_suicidal_function",
         "severity": "high",
-        "line": 63
+        "line": 60
     }
 ]
