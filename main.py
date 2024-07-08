@@ -62,7 +62,7 @@ def analyze_overflow_and_return(code):
 
 def check_private_key_exposure(code):
     tree = ast.parse(code)
-    private_key_words = ["privatekey", "private_key", "secretkey", "secret_key", "keypair", "key_pair","api_key"]
+    private_key_words = ["privatekey", "private_key", "secretkey", "secret_key", "keypair", "key_pair", "api_key"]
     
     for node in ast.walk(tree):
         if isinstance(node, astnodes.Assign):
@@ -142,8 +142,6 @@ def analyze_greedy_suicidal_functions(code):
             
             if has_transfer and not has_condition:
                 print(f"Potential greedy/suicidal contract detected in function '{node.name.id}' at line {get_line_number(node)}")
-
-
 
 def main():
     while True:

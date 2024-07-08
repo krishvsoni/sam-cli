@@ -1,125 +1,50 @@
-{
-  "vulnerabilities": [
-    {
-      "name": "Reentrancy",
-      "description": "A function calls an external contract before updating its state.",
-      "pattern": "external_call",
-      "severity": "high"
-    },
-    {
-      "name": "Integer Overflow and Underflow",
-      "description": "Arithmetic operations exceed the storage limit of a data type.",
-      "pattern": ["+", "-", "*", "/"],
-      "severity": "high"
-    },
-    {
-      "name": "Access Control Issues",
-      "description": "Functions or variables are accessible by unauthorized users.",
-      "pattern": "access_control",
-      "severity": "medium"
-    },
-    {
-      "name": "Uninitialized Storage Pointers",
-      "description": "Using uninitialized storage pointers can lead to unintentional data corruption.",
-      "pattern": "uninitialized_pointer",
-      "severity": "high"
-    },
-    {
-      "name": "Unrestricted Write to Storage",
-      "description": "Functions that can write to storage without proper checks.",
-      "pattern": "unrestricted_write",
-      "severity": "high"
-    },
-    {
-      "name": "Denial of Service (DoS)",
-      "description": "Operations that can block further actions by consuming excessive gas or resources.",
-      "pattern": "dos_attack",
-      "severity": "high"
-    },
-    {
-      "name": "Floating Pragma",
-      "description": "Using a floating pragma can lead to incompatibility with future compiler versions.",
-      "pattern": "floating_pragma",
-      "severity": "medium"
-    },
-    {
-      "name": "Self-Destruct Function",
-      "description": "Presence of self-destruct functions that can be called by unauthorized users.",
-      "pattern": "self_destruct",
-      "severity": "high"
-    },
-    {
-      "name": "Unchecked External Call",
-      "description": "Calls to external contracts that do not check the success of the call.",
-      "pattern": "unchecked_external_call",
-      "severity": "high"
-    },
-    {
-      "name": "Timestamp Dependence",
-      "description": "Using block timestamps for critical functionalities.",
-      "pattern": "timestamp_dependence",
-      "severity": "medium"
-    },
-    {
-      "name": "Block Number Dependence",
-      "description": "Using block numbers for critical functionalities.",
-      "pattern": "block_number_dependence",
-      "severity": "medium"
-    },
-    {
-      "name": "Unprotected Suicide",
-      "description": "Contracts that can be killed by unauthorized users.",
-      "pattern": "unprotected_suicide",
-      "severity": "high"
-    },
-    {
-      "name": "Signature Malleability",
-      "description": "Issues with cryptographic signature verification.",
-      "pattern": "signature_malleability",
-      "severity": "high"
-    },
-    {
-      "name": "Delegatecall Injection",
-      "description": "Using delegatecall without proper validation.",
-      "pattern": "delegatecall_injection",
-      "severity": "high"
-    },
-    {
-      "name": "Tx.origin Authentication",
-      "description": "Using tx.origin for authorization can be exploited through phishing.",
-      "pattern": "tx_origin",
-      "severity": "medium"
-    },
-    {
-      "name": "Short Address Attack",
-      "description": "Improper handling of Ethereum addresses that are less than 20 bytes.",
-      "pattern": "short_address_attack",
-      "severity": "high"
-    },
-    {
-      "name": "Default Visibility",
-      "description": "Functions that do not specify visibility.",
-      "pattern": "default_visibility",
-      "severity": "low"
-    },
-    {
-      "name": "Unhandled Exceptions",
-      "description": "Not handling exceptions properly from external calls.",
-      "pattern": "unhandled_exceptions",
-      "severity": "medium"
-    },
-    {
-      "name": "Gas Limit and Loops",
-      "description": "Functions that consume an excessive amount of gas.",
-      "pattern": "gas_limit_loops",
-      "severity": "high"
-    },
-    {
-      "name": "Force Sending Ether to Contracts",
-      "description": "Contracts that can be forced to receive ether.",
-      "pattern": "force_send_ether",
-      "severity": "medium"
-    }
-  ]
-}
-
+[
+  {
+    "name": "Missing Return Statement",
+    "description": "A function does not have a return statement.",
+    "pattern": "Function without return",
+    "severity": "medium"
+  },
+  {
+    "name": "Integer Overflow/Underflow",
+    "description": "An arithmetic operation results in an integer value that exceeds the allowable range.",
+    "pattern": "Addition, Subtraction, Multiplication with large values",
+    "severity": "high"
+  },
+  {
+    "name": "Private Key Exposure",
+    "description": "A variable name suggests that it contains a private key.",
+    "pattern": "privatekey, private_key, secretkey, secret_key, keypair, key_pair, api_key",
+    "severity": "critical"
+  },
+  {
+    "name": "Reentrancy",
+    "description": "A function calls an external contract before updating its state.",
+    "pattern": "external_call",
+    "severity": "high"
+  },
+  {
+    "name": "Floating Pragma",
+    "description": "Deprecated functions that can lead to security vulnerabilities are used.",
+    "pattern": "setfenv, getfenv",
+    "severity": "medium"
+  },
+  {
+    "name": "Denial of Service",
+    "description": "Functions that can cause a denial of service.",
+    "pattern": "perform_expensive_operation",
+    "severity": "high"
+  },
+  {
+    "name": "Unchecked External Call",
+    "description": "An external call is made without checking its result.",
+    "pattern": "Call with an external function",
+    "severity": "high"
+  },
+  {
+    "name": "Greedy/Suicidal Contract",
+    "description": "A contract makes fund transfers without proper condition checks.",
+    "pattern": "transfer, transfer_funds, transferfunds, send, pay",
+    "severity": "high"
+  }
+]
