@@ -81,28 +81,28 @@
         "description": "Potential integer overflow/underflow detected with left operand.",
         "pattern": "overflow_underflow",
         "severity": "high",
-        "line": null
+        "line": 2
     },
     {
         "name": "Integer Overflow/Underflow",
         "description": "Potential integer overflow/underflow detected with left operand.",
         "pattern": "overflow_underflow",
         "severity": "high",
-        "line": null
+        "line": 2
     },
     {
         "name": "Integer Overflow/Underflow",
         "description": "Potential integer overflow/underflow detected with right operand.",
         "pattern": "overflow_underflow",
         "severity": "high",
-        "line": null
+        "line": 45
     },
     {
         "name": "Integer Overflow/Underflow",
         "description": "Potential integer overflow/underflow detected with right operand.",
         "pattern": "overflow_underflow",
         "severity": "high",
-        "line": null
+        "line": 45
     },
     {
         "name": "Reentrancy",
