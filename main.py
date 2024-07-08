@@ -62,7 +62,7 @@ def analyze_overflow_and_return(code):
 
 def check_private_key_exposure(code):
     tree = ast.parse(code)
-    private_key_words = ["privatekey", "private_key", "secretkey", "secret_key", "keypair", "key_pair"]
+    private_key_words = ["privatekey", "private_key", "secretkey", "secret_key", "keypair", "key_pair","api_key"]
     
     for node in ast.walk(tree):
         if isinstance(node, astnodes.Assign):
@@ -98,6 +98,29 @@ def analyze_floating_pragma(code):
             if node.func.id in deprecated_functions:
                 print(f"Floating pragma issue detected with function '{node.func.id}' at line {get_line_number(node)}")
 
+def analyze_denial_of_service(code):
+    tree = ast.parse(code)
+    
+    for node in ast.walk(tree):
+        if isinstance(node, astnodes.Call) and isinstance(node.func, astnodes.Name):
+            # Example of identifying potential DoS patterns (you can adjust this based on Lua-specific behaviors)
+            if node.func.id == "perform_expensive_operation":
+                print(f"Potential Denial of Service vulnerability detected with function '{node.func.id}' at line {get_line_number(node)}")
+
+def analyze_unchecked_external_call(code):
+    tree = ast.parse(code)
+    
+    def is_external_call(node):
+        return isinstance(node, astnodes.Call) and isinstance(node.func, astnodes.Name)
+    
+    for node in ast.walk(tree):
+        if isinstance(node, astnodes.Call) and is_external_call(node):
+            # Assuming `call_external_contract` is a placeholder for any external call function
+            if node.func.id == "call_external_contract":
+                parent = node.parent
+                if not isinstance(parent, astnodes.If) and not isinstance(parent, astnodes.Conditional):
+                    print(f"Unchecked external call detected with function '{node.func.id}' at line {get_line_number(node)}")
+
 def main():
     while True:
         file_path = input("Enter the path to the Lua code file (or 'exit' to quit): ").strip()
@@ -117,6 +140,8 @@ def main():
         analyze_reentrancy(code)
         check_private_key_exposure(code)
         analyze_floating_pragma(code)
+        analyze_denial_of_service(code)
+        analyze_unchecked_external_call(code)
 
 if __name__ == "__main__":
     main()
