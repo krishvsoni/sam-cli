@@ -77,30 +77,58 @@
         "line": 74
     },
     {
-        "name": "Integer Overflow/Underflow",
-        "description": "Potential integer overflow/underflow detected with left operand.",
-        "pattern": "overflow_underflow",
+        "name": "Integer Overflow",
+        "description": "Potential integer overflow detected with left operand.",
+        "pattern": "overflow",
         "severity": "high",
         "line": 2
     },
     {
-        "name": "Integer Overflow/Underflow",
-        "description": "Potential integer overflow/underflow detected with left operand.",
-        "pattern": "overflow_underflow",
+        "name": "Integer Overflow",
+        "description": "Potential integer overflow detected with left operand.",
+        "pattern": "overflow",
         "severity": "high",
         "line": 2
     },
     {
-        "name": "Integer Overflow/Underflow",
-        "description": "Potential integer overflow/underflow detected with right operand.",
-        "pattern": "overflow_underflow",
+        "name": "Integer Overflow",
+        "description": "Potential integer overflow detected with right operand.",
+        "pattern": "overflow",
         "severity": "high",
         "line": 45
     },
     {
-        "name": "Integer Overflow/Underflow",
-        "description": "Potential integer overflow/underflow detected with right operand.",
-        "pattern": "overflow_underflow",
+        "name": "Integer Overflow",
+        "description": "Potential integer overflow detected with right operand.",
+        "pattern": "overflow",
+        "severity": "high",
+        "line": 45
+    },
+    {
+        "name": "Integer Underflow",
+        "description": "Potential integer underflow detected with left operand.",
+        "pattern": "underflow",
+        "severity": "high",
+        "line": 2
+    },
+    {
+        "name": "Integer Underflow",
+        "description": "Potential integer underflow detected with left operand.",
+        "pattern": "underflow",
+        "severity": "high",
+        "line": 2
+    },
+    {
+        "name": "Integer Underflow",
+        "description": "Potential integer underflow detected with right operand.",
+        "pattern": "underflow",
+        "severity": "high",
+        "line": 45
+    },
+    {
+        "name": "Integer Underflow",
+        "description": "Potential integer underflow detected with right operand.",
+        "pattern": "underflow",
         "severity": "high",
         "line": 45
     },

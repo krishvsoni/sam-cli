@@ -1,6 +1,6 @@
+report.json
 node_modules
 venv
 .env
 .pycache
 test
-report.json
