@@ -107,19 +107,43 @@ def analyze_denial_of_service(code):
             if node.func.id == "perform_expensive_operation":
                 print(f"Potential Denial of Service vulnerability detected with function '{node.func.id}' at line {get_line_number(node)}")
 
-def analyze_unchecked_external_call(code):
+def analyze_unchecked_external_calls(code):
     tree = ast.parse(code)
     
     def is_external_call(node):
-        return isinstance(node, astnodes.Call) and isinstance(node.func, astnodes.Name)
+        return isinstance(node, astnodes.Call) and isinstance(node.func, astnodes.Index) and isinstance(node.func.value, astnodes.Name)
     
     for node in ast.walk(tree):
-        if isinstance(node, astnodes.Call) and is_external_call(node):
-            # Assuming `call_external_contract` is a placeholder for any external call function
-            if node.func.id == "call_external_contract":
-                parent = node.parent
-                if not isinstance(parent, astnodes.If) and not isinstance(parent, astnodes.Conditional):
-                    print(f"Unchecked external call detected with function '{node.func.id}' at line {get_line_number(node)}")
+        if isinstance(node, astnodes.Function):
+            for n in node.body.body:
+                if is_external_call(n):
+                    print(f"Unchecked external call detected in function '{node.name.id}' at line {get_line_number(n)}")
+
+def analyze_greedy_suicidal_functions(code):
+    tree = ast.parse(code)
+    transfer_functions = ["transfer", "transfer_funds", "transferfunds", "send", "pay"]
+    
+    def is_fund_transfer(node):
+        return isinstance(node, astnodes.Call) and isinstance(node.func, astnodes.Name) and node.func.id.lower() in transfer_functions
+    
+    def has_conditional(node):
+        return isinstance(node, (astnodes.If, astnodes.ElseIf))
+    
+    for node in ast.walk(tree):
+        if isinstance(node, astnodes.Function):
+            has_transfer = False
+            has_condition = False
+            
+            for n in node.body.body:
+                if is_fund_transfer(n):
+                    has_transfer = True
+                if has_conditional(n):
+                    has_condition = True
+            
+            if has_transfer and not has_condition:
+                print(f"Potential greedy/suicidal contract detected in function '{node.name.id}' at line {get_line_number(node)}")
+
+
 
 def main():
     while True:
@@ -141,7 +165,8 @@ def main():
         check_private_key_exposure(code)
         analyze_floating_pragma(code)
         analyze_denial_of_service(code)
-        analyze_unchecked_external_call(code)
+        analyze_unchecked_external_calls(code)
+        analyze_greedy_suicidal_functions(code)
 
 if __name__ == "__main__":
     main()
