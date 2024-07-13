@@ -7,13 +7,6 @@ from jinja2 import Environment, FileSystemLoader
 INT_MAX = 2147483647
 INT_MIN = -2147483648
 
-COLORS = {
-    "red": "\033[91m",
-    "yellow": "\033[93m",
-    "cyan": "\033[96m",
-    "reset": "\033[0m"
-}
-
 vulnerabilities = []
 
 def add_vulnerability(name, description, pattern, severity, line):
@@ -223,142 +216,115 @@ def analyze_reentrancy(code):
                         if has_state_change(subsequent_node):
                             add_vulnerability(
                                 "Reentrancy",
-                                "A function calls an external contract before updating its state.",
-                                "external_call",
+                                f"Reentrancy vulnerability detected in function '{node.name.id}'.",
+                                "reentrancy",
                                 "high",
                                 get_line_number(node)
                             )
 
 def analyze_floating_pragma(code):
-    deprecated_functions = ["setfenv", "getfenv"]
     tree = ast.parse(code)
+    deprecated_functions = ["setfenv", "getfenv"]
 
     for node in ast.walk(tree):
-        if isinstance(node, astnodes.Call) and isinstance(node.func, astnodes.Name):
-            if node.func.id in deprecated_functions:
-                add_vulnerability(
-                    "Floating Pragma",
-                    f"Floating pragma issue detected with function '{node.func.id}'.",
-                    "floating_pragma",
-                    "low",
-                    get_line_number(node)
-                )
+        if isinstance(node, astnodes.Call) and isinstance(node.func, astnodes.Name) and node.func.id in deprecated_functions:
+            add_vulnerability(
+                "Floating Pragma",
+                f"Deprecated function '{node.func.id}' used.",
+                "floating_pragma",
+                "medium",
+                get_line_number(node)
+            )
 
 def analyze_denial_of_service(code):
     tree = ast.parse(code)
 
     for node in ast.walk(tree):
-        if isinstance(node, astnodes.Call) and isinstance(node.func, astnodes.Name):
-            if node.func.id == "perform_expensive_operation":
-                add_vulnerability(
-                    "Denial of Service",
-                    f"Potential Denial of Service vulnerability detected with function '{node.func.id}'.",
-                    "denial_of_service",
-                    "medium",
-                    get_line_number(node)
-                )
+        if isinstance(node, astnodes.Function):
+            body = node.body.body
+            for n in body:
+                if isinstance(n, astnodes.Fornum):
+                    if isinstance(n.body[0], astnodes.Call):
+                        add_vulnerability(
+                            "Denial of Service",
+                            f"Potential denial of service detected in function '{node.name.id}' due to expensive operation in loop.",
+                            "denial_of_service",
+                            "high",
+                            get_line_number(node)
+                        )
 
 def analyze_unchecked_external_calls(code):
     tree = ast.parse(code)
 
-    def is_external_call(node):
-        return isinstance(node, astnodes.Call) and isinstance(node.func, astnodes.Index) and isinstance(node.func.value, astnodes.Name)
-
     for node in ast.walk(tree):
         if isinstance(node, astnodes.Function):
-            for n in node.body.body:
-                if is_external_call(n):
-                    add_vulnerability(
-                        "Unchecked External Calls",
-                        f"Unchecked external call detected in function '{node.name.id}'.",
-                        "unchecked_external_call",
-                        "medium",
-                        get_line_number(n)
-                    )
+            for body_node in ast.walk(node.body):
+                if isinstance(body_node, astnodes.Call) and isinstance(body_node.func, astnodes.Attribute):
+                    if body_node.func.attr == "some_function":
+                        add_vulnerability(
+                            "Unchecked External Call",
+                            f"Unchecked external call in function '{node.name.id}'.",
+                            "unchecked_external_call",
+                            "high",
+                            get_line_number(body_node)
+                        )
 
 def analyze_greedy_suicidal_functions(code):
     tree = ast.parse(code)
-    transfer_functions = ["transfer", "transfer_funds", "transferfunds", "send", "pay"]
-
-    def is_fund_transfer(node):
-        return isinstance(node, astnodes.Call) and isinstance(node.func, astnodes.Name) and node.func.id.lower() in transfer_functions
 
     for node in ast.walk(tree):
         if isinstance(node, astnodes.Function):
-            for n in node.body.body:
-                if is_fund_transfer(n):
+            for body_node in ast.walk(node.body):
+                if isinstance(body_node, astnodes.Call) and isinstance(body_node.func, astnodes.Name) and body_node.func.id == "transfer":
                     add_vulnerability(
-                        "Greedy Suicidal Functions",
-                        f"Potential issue with fund transfer function '{n.func.id}'.",
+                        "Greedy/Suicidal Function",
+                        f"Function '{node.name.id}' includes a transfer of funds.",
                         "greedy_suicidal_function",
                         "high",
-                        get_line_number(n)
+                        get_line_number(body_node)
                     )
 
-def print_vulnerabilities():
-    for vulnerability in vulnerabilities:
-        severity_color = COLORS["red"] if vulnerability["severity"] == "high" else COLORS["yellow"]
-        print(f"{severity_color}Vulnerability: {vulnerability['name']} ({vulnerability['severity']}){COLORS['reset']}")
-        print(f"Description: {vulnerability['description']}")
-        print(f"Pattern: {vulnerability['pattern']}")
-        print(f"Line: {vulnerability['line']}\n")
-
-def save_report(file_path):
-    with open(file_path, 'w') as file:
-        json.dump(vulnerabilities, file, indent=4)
-
-def run_analysis(file_path):
-    with open(file_path, 'r') as file:
-        code = file.read()
-
-    analyze_return(code)
+def analyze_code_for_vulnerabilities(code):
     analyze_overflow_and_return(code)
     analyze_underflow_and_return(code)
-    analyze_reentrancy(code)
+    analyze_return(code)
     check_private_key_exposure(code)
+    analyze_reentrancy(code)
     analyze_floating_pragma(code)
     analyze_denial_of_service(code)
     analyze_unchecked_external_calls(code)
     analyze_greedy_suicidal_functions(code)
 
-    print_vulnerabilities()
+def process_files_in_directory(directory):
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.endswith('.lua'):
+                file_path = os.path.join(root, file)
+                with open(file_path, 'r') as f:
+                    code = f.read()
 
-    report_json_path = "report.json"
-    report_html_path = "report.html"
+                code_lines = code.split('\n')
+                code_lines = [line for line in code_lines if not line.startswith('require')]
+                cleaned_code = '\n'.join(code_lines)
 
-    save_report(report_json_path)
-    generate_html_report(report_json_path, report_html_path)
-    print(f"\nVulnerability report saved to {report_json_path} and {report_html_path}\n")
+                analyze_code_for_vulnerabilities(cleaned_code)
+
+def generate_vulnerability_report(output_file, vulnerabilities):
+    env = Environment(loader=FileSystemLoader('.'))
+    template = env.get_template('report_template.html')
+
+    html_content = template.render(vulnerabilities=vulnerabilities)
+
+    with open(output_file, 'w') as f:
+        f.write(html_content)
 
 def main():
-    import argparse
+    directory = input("Enter the directory containing Lua files: ")
+    process_files_in_directory(directory)
 
-    parser = argparse.ArgumentParser(description="Vulnerability Analyzer")
-    parser.add_argument("file", help="Path to code file")
-    parser.add_argument("--function", help="Specify a function to run (e.g., --function analyze_return)")
-
-    args = parser.parse_args()
-
-    if os.path.isfile(args.file):
-        print(f"Analyzing file: {args.file}")
-        run_analysis(args.file)
-    else:
-        print("File not found. Please enter a valid file path.")
-
-def generate_html_report(json_file, html_file):
-    with open(json_file, 'r') as f:
-        vulnerabilities = json.load(f)
-
-    template_loader = FileSystemLoader(searchpath="./")
-    template_env = Environment(loader=template_loader)
-    template = template_env.get_template("report_template.html")
-
-    output_text = template.render(vulnerabilities=vulnerabilities)
-
-    with open(html_file, 'w') as f:
-        f.write(output_text)
-
-    print(f"Report generated: {html_file}")
+    output_file = 'vulnerability_report.html'
+    generate_vulnerability_report(output_file, vulnerabilities)
+    print(f"Vulnerability report generated: {output_file}")
 
 if __name__ == "__main__":
     main()
