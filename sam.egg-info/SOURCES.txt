@@ -1,3 +1,4 @@
+README.md
 setup.py
 sam/__init__.py
 sam/cli.py

@@ -1,5 +1,3 @@
-# main.py
-
 from luaparser import ast, astnodes
 import os
 import json

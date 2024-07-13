@@ -53,21 +53,28 @@
         "description": "A function is missing a return statement.",
         "pattern": "missing_return",
         "severity": "low",
-        "line": 59
+        "line": 57
     },
     {
         "name": "Missing Return Statement",
         "description": "A function is missing a return statement.",
         "pattern": "missing_return",
         "severity": "low",
-        "line": 64
+        "line": 63
     },
     {
         "name": "Missing Return Statement",
         "description": "A function is missing a return statement.",
         "pattern": "missing_return",
         "severity": "low",
-        "line": 70
+        "line": 68
+    },
+    {
+        "name": "Missing Return Statement",
+        "description": "A function is missing a return statement.",
+        "pattern": "missing_return",
+        "severity": "low",
+        "line": 74
     },
     {
         "name": "Integer Overflow",
@@ -144,21 +151,21 @@
         "description": "Floating pragma issue detected with function 'setfenv'.",
         "pattern": "floating_pragma",
         "severity": "low",
-        "line": 65
+        "line": 69
     },
     {
         "name": "Floating Pragma",
         "description": "Floating pragma issue detected with function 'getfenv'.",
         "pattern": "floating_pragma",
         "severity": "low",
-        "line": 66
+        "line": 70
     },
     {
         "name": "Denial of Service",
         "description": "Potential Denial of Service vulnerability detected with function 'perform_expensive_operation'.",
         "pattern": "denial_of_service",
         "severity": "medium",
-        "line": 71
+        "line": 75
     },
     {
         "name": "Greedy Suicidal Functions",
@@ -172,6 +179,6 @@
         "description": "Potential issue with fund transfer function 'transfer'.",
         "pattern": "greedy_suicidal_function",
         "severity": "high",
-        "line": 60
+        "line": 64
     }
 ]
